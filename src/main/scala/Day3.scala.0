@@ -1,0 +1,61 @@
+object Day3 extends App {
+
+  import scala.io.Source
+
+  //val f = Source.fromFile("../../../data/Day3.example.txt")
+  val f = Source.fromFile("../../../data/Day3.txt")
+  val width = f.getLines().next().length()
+  val readings = f.reset().getLines().toList.map(x => Integer.parseInt(x, 2))
+
+  val a:Array[Int] = new Array(width)
+
+  readings.foreach{x => 
+     (0 until width).foreach{b =>
+       if ((x & (1 << b)) > 0) a(b) = a(b) + 1   
+     }
+  }
+
+  val length = readings.length
+  println("length=" + length)
+  println("width=" + width)
+  println("readings=" + readings)
+  val v = for (i <- 0 until width)
+     yield if (a(i) > length/2) 1<<i else 0
+  println("MC=" + v)
+  val w = for (i <- 0 until width)
+     yield if (a(i) < length/2) 1<<i else 0
+  println("LC=" + w)
+  println("answer1=" + w.sum * v.sum)
+
+  var l = readings
+  for (i <- width - 1 to 0 by -1) {
+      println("****** i = " + i)
+      val posmask = 1 << i
+      val c = l.count{x => (x & posmask) > 0}
+      println("ll="+ l.map{x => x & posmask})
+      val mc = if (c >= (l.length + 1)/2) 1 else 0
+      println("i="+ i + " 1<<i=" + (1 << i) + " c=" + c + " mc=" + mc + " len="+l.length)
+      println("l0=" + l)
+      l = l.filter{x => (x & posmask) == mc << i}
+      println("l=" + l)
+  }
+  val o2 = l.head
+  println("l=" + l)
+
+  l = readings
+  for (i <- width - 1 to 0 by -1) {
+      println("****** i = " + i)
+      val posmask = 1 << i
+      val c = l.count{x => (x & posmask) > 0}
+      println("ll="+ l.map{x => x & posmask})
+      val lc = if (c <= (l.length - 1)/2) 1 else 0
+      println("i="+ i + " 1<<i=" + (1 << i) + " c=" + c + " lc=" + lc + " len="+l.length)
+      println("l0=" + l)
+      if (l.length > 1) 
+         l = l.filter{x => (x & posmask) == lc << i}
+      println("l=" + l)
+  }
+  val co2 = l.head
+  println("l=" + l)
+  println("answer2=" + (o2 * co2))
+}
